@@ -81,9 +81,8 @@ def actions(state):
 
 #  result 
 def result(state, action):
- 
     (fr, fc), (tr, tc) = action
-    player   = state.player
+    player = state.player
     opponent = -player
 
     new_board = [row[:] for row in state.board]
@@ -92,12 +91,18 @@ def result(state, action):
     new_board[tr][tc] = player
     new_board[fr][fc] = 0
 
-    # 2. Trap-check: only the neighbours of the destination square matter
+    # 2. First collect all trapped adjacent opponent tokens
+    trapped_positions = []
+
     for (nr, nc) in ADJ[(tr, tc)]:
         if new_board[nr][nc] == opponent and _is_trapped(new_board, (nr, nc)):
-            new_board[nr][nc] = 0
+            trapped_positions.append((nr, nc))
 
-    # 3. Switch turn
+    # 3. Remove them together
+    for (nr, nc) in trapped_positions:
+        new_board[nr][nc] = 0
+
+    # 4. Switch turn
     return State(new_board, opponent)
 
 
